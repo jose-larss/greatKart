@@ -1,13 +1,20 @@
 from django.shortcuts import render, get_object_or_404
 from store.models import Product
 from category.models import Category
+from cart.models import CartItem
+
+from cart.views import _cart_id
+
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 
 def product_detail(request, category_slug, product_slug):
     category = get_object_or_404(Category, slug = category_slug)
     single_product = get_object_or_404(Product, slug = product_slug, category = category)
+    in_cart = CartItem.objects.filter(cart__cart_id=_cart_id(request), product=single_product)
 
-    return render(request, "store/product-detail.html", {'single_product':single_product})
+    return render(request, "store/product-detail.html", {'single_product':single_product, 
+                                                         'in_cart':in_cart})
 
 
 def store(request, category_slug = None):
@@ -17,4 +24,9 @@ def store(request, category_slug = None):
     else:
         products = Product.objects.filter(is_available = True)
 
-    return render(request, "store/store.html", {'products':products})
+    # Se implementa la paginación
+    paginator = Paginator(products, 1) # 6 productos por pagina
+    page_number = request.GET.get('page') 
+    page_products = paginator.get_page(page_number)
+
+    return render(request, "store/store.html", {'products':page_products})
