@@ -52,24 +52,33 @@
 												<div class="input-group input-spinner">
 													<div class="input-group-prepend">
 														<a 
-															href="{% url 'remove_cart' item.product.id %}"
+															href="{% url 'remove_cart' item.product.id item.id %}"
 															class="btn btn-light" 
 															type="button" 
-															id="button-plus"
+															id="button-minus"
 														> 
 															<i class="fa fa-minus"></i> 
 														</a>
 													</div>
 													<input type="text" class="form-control"  value="{{item.quantity}}">
 													<div class="input-group-append">
-														<a 
-															href="{% url 'add_cart' item.product.id %}" 
-															class="btn btn-light" 
-															type="button" 
-															id="button-minus"
-														> 
-															<i class="fa fa-plus"></i> 
-														</a>
+														<form action="{% url 'add_cart' item.product.id %}" method="post">
+															{% csrf_token %}
+															{% for var in item.variations.all %}
+																<input 
+																	type="hidden" 
+																	name="{{var.variation_category | lower}}"
+																	value="{{var.variation_value | capfirst}}"
+																>
+															{% endfor %}
+															<button 
+																class="btn btn-light" 
+																type="submit" 
+																id="button-plus"
+															> 
+																<i class="fa fa-plus"></i> 
+															</button>
+														</form>
 													</div>
 												</div> <!-- input-group.// -->
 											</div> <!-- col.// -->
@@ -81,8 +90,9 @@
 											</div> <!-- price-wrap .// -->
 										</td>
 										<td class="text-right"> 
-											<a 
-												href="{% url 'remove_cart_item' item.product.id %}" 
+											<a 	
+												onclick="return confirm('Are you sure to delete this Item?')"
+												href="{% url 'remove_cart_item' item.product.id item.id %}" 
 												class="btn btn-danger"> 
 												Remove
 											</a>
