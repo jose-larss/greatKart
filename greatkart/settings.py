@@ -145,3 +145,11 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger", # esto es de bootstrapt
     #50: "critical",
 }
+
+# SMTP Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER =  'joselucianocastro10@gmail.com' #DESDE DONDE SE ENVIAN CORREOS
+EMAIL_HOST_PASSWORD = 'dzxrzsopwkvnhtbe'
+EMAIL_USE_TLS = True

@@ -32,5 +32,7 @@ class RegistrationForm(forms.ModelForm):
 
         if password != confirm_password:
             raise forms.ValidationError('Password does not Match!.')
+        
+        return cleaned_data
 
        

@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
 class MyAccountManager(BaseUserManager):
-    def create_user(self, first_name, last_name, username, email, password=None):
+    def create_user(self, first_name, last_name, username, email, password = None):
         if not email:
             raise ValueError('User must have an Email Adress')
         if not username:
@@ -55,6 +55,7 @@ class Account(AbstractBaseUser):
     is_superAdmin = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
+    EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     objects = MyAccountManager()
