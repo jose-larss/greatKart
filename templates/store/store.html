@@ -7,7 +7,11 @@
 <!-- ========================= SECTION PAGETOP ========================= -->
 <section class="section-pagetop bg">
 	<div class="container">
-		<h2 class="title-page">Our Store</h2>
+		{% if 'search' in request.path %}
+			<h2 class="title-page">Search Results</h2>
+		{% else%}
+			<h2 class="title-page">Our Store</h2>
+		{% endif %}
 		
 	</div> <!-- container //  -->
 </section>
@@ -128,39 +132,45 @@
 				</header><!-- sect-heading -->
 
 				<div class="row">
-					{% for product in products %}
-						<div class="col-md-4">
-							<figure class="card card-product-grid">
-								<div class="img-wrap"> 
-									
-									<a href="{{product.get_url}}"><img src="{{product.image.url}}"></a>
-									
-								</div> <!-- img-wrap.// -->
-								<figcaption class="info-wrap">
-									<div class="fix-height">
-										<a href="{{product.get_url}}" class="title">{{product.product_name}}</a>
-										<div class="price-wrap mt-2">
-											<span class="price">{{product.price}} €</span>
-										</div> <!-- price-wrap.// -->
-									</div>
-									{% if product.stock %}
-										<a 
-											href="{% url 'add_cart' product.id %}" 
-											class="btn btn-block btn-primary">
-											Added to cart 
-										</a>
-									{% else %}
-										<a 
-											aria-disabled="true"
-											disabled
-											class="btn btn-block btn-outline-primary">
-											Out of Stok 
-										</a>
-									{% endif %}
-								</figcaption>
-							</figure>
-						</div> <!-- col.// -->
-					{% endfor %}
+					{% if products %}
+						{% for product in products %}
+							<div class="col-md-4">
+								<figure class="card card-product-grid">
+									<div class="img-wrap"> 
+										
+										<a href="{{product.get_url}}"><img src="{{product.image.url}}"></a>
+										
+									</div> <!-- img-wrap.// -->
+									<figcaption class="info-wrap">
+										<div class="fix-height">
+											<a href="{{product.get_url}}" class="title">{{product.product_name}}</a>
+											<div class="price-wrap mt-2">
+												<span class="price">{{product.price}} €</span>
+											</div> <!-- price-wrap.// -->
+										</div>
+										{% if product.stock %}
+											<a 
+												href="{% url 'add_cart' product.id %}" 
+												class="btn btn-block btn-primary">
+												Added to cart 
+											</a>
+										{% else %}
+											<a 
+												aria-disabled="true"
+												disabled
+												class="btn btn-block btn-outline-primary">
+												Out of Stok 
+											</a>
+										{% endif %}
+									</figcaption>
+								</figure>
+							</div> <!-- col.// -->
+						{% endfor %}
+					{% else %}
+						<div>
+							<h2>No Result found. Please try again.</h2>
+						</div>
+					{% endif %}
 
 				</div> <!-- row end.// -->
 
