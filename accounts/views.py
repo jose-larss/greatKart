@@ -1,8 +1,12 @@
+import requests
+from urllib.parse import urlparse
 from django.contrib import messages, auth
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from accounts.forms import RegistrationForm
 from accounts.models import Account
+from cart.models import Cart, CartItem
+from cart.views import _cart_id
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
@@ -94,16 +98,72 @@ def register(request):
 
 
 def login(request):
+    ex_var_list = []
+    id = []
+
     if request.method == "POST":
         email = request.POST['email']
         password = request.POST['password']
 
         user = auth.authenticate(request, email=email, password=password)
         if user is not None:
-            auth.login(request, user)
+            # comprobar si el usuario esta logado y asignar carro
+            try:
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+                if is_cart_item_exists:
+                    cart_item = CartItem.objects.filter(cart=cart)
+                    
+                    #Getting de product variation by cart id
+                    product_variation = []
+                    for item in cart_item:
+                        variation = item.variations.all()
+                        product_variation.append(list(variation))
+
+                    #Get the cart items from the user to access his product variations
+                    cart_item = CartItem.objects.filter(user=user)
+
+                    for item in cart_item:
+                        existing_variation = item.variations.all()
+                        ex_var_list.append(list(existing_variation))
+                        id.append(item.id)
+                    print("Ex_var_list es: ",ex_var_list)
+                    print(id)
+                    for pr in product_variation:
+                        if pr in ex_var_list:
+                            index = ex_var_list.index(pr)
+                            print(index)
+                            item_id = id[index]
+                            item = CartItem.objects.get(id=item_id)
+                            item.quantity += 1
+                            item.user = user
+                            item.save()
+                        else:
+                            cart_item = CartItem.objects.filter(cart=cart)
+                                
+                            for item in cart_item:
+                                item.user = user
+                                item.save()
+            except:
+                pass
+
+
+            auth.login(request, user) # cuando se autentica cambia el id de sesion
 
             messages.success(request, "Your are now Login")
-            return redirect('dashboard') #actualmente aqui mas tarde ira a dashboard
+            url = request.META.get('HTTP_REFERER')
+            try:
+                # Parsear la URL para obtener el query string
+                query = urlparse(url).query
+                # next=/cart/checkout
+                params = dict(x.split('=') for x in query.split('&'))
+                if 'next' in params:
+                    next_page = params['next']
+                    return redirect(next_page)
+                
+            except:
+                return redirect('dashboard') #actualmente aqui mas tarde ira a dashboard
+            
         else:
             messages.error(request, "Invalid Login credentials")
             return redirect('login')
