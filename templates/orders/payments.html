@@ -130,6 +130,7 @@
                 let csrfToken = '{{csrf_token}}'
                 let orderId = '{{order.order_number}}'
                 let payment_method = "PayPal"
+                const redirect_url = "{% url 'order_completed' %}"
     
                 // Realizar la solicitud usando fetch
                 let response = await fetch(url, {
@@ -147,8 +148,10 @@
     
                 // Verificar si la solicitud fue exitosa
                 if (response.ok) {
-                    let json = await response.json(); // Convertir la respuesta a JSON
-
+                    let data = await response.json(); // Convertir la respuesta a JSON
+                    //console.log('Success: ', data)
+                    //console.log('Transaction Completed.')
+                    window.location.href = redirect_url + '?order_number=' + data.order_number + '&payment_id=' + data.transId
                 } else {
                     console.error('Error en la respuesta del servidor');
                 }
