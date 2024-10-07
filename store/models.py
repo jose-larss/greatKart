@@ -62,6 +62,18 @@ class Product(models.Model):
         if reviews['count'] is not None:
             count = int(reviews['count'])
         return count
+    
+
+class ProductGallery(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, default=None)
+    image = models.ImageField(upload_to="store/products", max_length=255)
+
+    def __str__(self):
+        return self.product.product_name
+    
+    class Meta:
+        verbose_name = "Product Gallery"
+        verbose_name_plural = "Product Gallery"
 
     
 

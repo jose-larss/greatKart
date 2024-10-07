@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.contrib import messages
 
 from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
-from store.models import Product, ReviewRating
+from store.models import Product, ReviewRating, ProductGallery
 from category.models import Category
 from cart.models import CartItem
 from orders.models import Order, OrderProduct
@@ -67,10 +67,14 @@ def product_detail(request, category_slug, product_slug):
     # Set the reviews
     reviews = ReviewRating.objects.filter(product = single_product, status=True)
 
+    # Get the product Gallery
+    product_gallery = ProductGallery.objects.filter(product=single_product)
+
     return render(request, "store/product-detail.html", {'single_product':single_product, 
                                                          'in_cart':in_cart,
                                                          'order_product':order_product,
-                                                         'reviews':reviews})
+                                                         'reviews':reviews,
+                                                         'product_gallery':product_gallery})
 
 
 def store(request, category_slug = None):
